@@ -185,26 +185,56 @@ header.hero { text-align: center; padding: 84px 24px 44px; position: relative; }
 
 /* ---- signature wall ---- */
 .wall-stage {
-  position: relative; height: 62vh; min-height: 420px; overflow: hidden;
+  position: relative; overflow: hidden;
+  height: calc(100dvh - 62px); min-height: 560px;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   background: radial-gradient(ellipse 70% 90% at 50% 50%, rgba(20, 28, 52, 0.85) 0%, rgba(4, 6, 12, 0.9) 75%);
 }
+.wall-stage .stage-head {
+  position: absolute; top: 30px; width: 100%; text-align: center; pointer-events: none; z-index: 2;
+}
+.wall-stage .stage-head .kicker {
+  font-family: var(--mono); font-size: 12px; letter-spacing: 0.4em;
+  text-transform: uppercase; color: var(--cyan); opacity: 0.85;
+}
+.wall-stage .stage-head h1 {
+  font-family: var(--display); font-weight: 400; font-size: clamp(22px, 3vw, 34px);
+  text-transform: uppercase; letter-spacing: 0.1em; margin-top: 10px;
+  background: linear-gradient(120deg, #eaf4ff, var(--cyan));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.wall-stage .stage-head .count { font-family: var(--mono); font-size: 13px; color: var(--text-dim); margin-top: 8px; letter-spacing: 0.14em; }
+.wall-stage .stage-head .count strong { color: var(--cyan); }
 .wall-stage .stage-hint {
-  position: absolute; bottom: 14px; width: 100%; text-align: center;
+  position: absolute; bottom: 18px; width: 100%; text-align: center;
   font-family: var(--mono); font-size: 11px; color: var(--text-dim);
   letter-spacing: 0.3em; text-transform: uppercase; pointer-events: none;
 }
 
 .sig-card {
-  position: absolute; opacity: 0; max-width: 340px;
-  transition: opacity 2.4s ease;
+  position: absolute; opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 1.6s cubic-bezier(0.22, 1, 0.36, 1), transform 1.6s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: auto;
 }
-.sig-card.visible { opacity: 1; }
-.sig-card .sig-name { font-size: 30px; line-height: 1.15; text-shadow: 0 0 26px rgba(110, 201, 255, 0.25); }
-.sig-card .sig-msg { font-family: var(--serif); font-size: 14px; color: var(--text-dim); margin-top: 6px; font-style: italic; }
-.sig-card .sig-meta { font-family: var(--mono); font-size: 10.5px; color: #5b6880; margin-top: 7px; letter-spacing: 0.08em; }
+.sig-card.visible { opacity: 1; transform: translateY(0); }
+.wall-stage .sig-card { height: 180px; overflow: hidden; padding: 6px 2px; }
+.sig-card .sig-name {
+  font-size: 30px; line-height: 1.15; text-shadow: 0 0 26px rgba(110, 201, 255, 0.25);
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.sig-card .sig-msg {
+  font-family: var(--serif); font-size: 14px; color: var(--text-dim); margin-top: 6px; font-style: italic;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+}
+.sig-card .sig-meta {
+  font-family: var(--mono); font-size: 10.5px; color: #5b6880; margin-top: 7px; letter-spacing: 0.08em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sig-card { transition: opacity 0.6s ease; transform: none; }
+}
 
 .sig-font-serif   { font-family: var(--serif); }
 .sig-font-script  { font-family: var(--script); }
@@ -218,7 +248,7 @@ header.hero { text-align: center; padding: 84px 24px 44px; position: relative; }
   gap: 18px; padding: 44px 0 80px;
 }
 .sig-grid .sig-card {
-  position: static; opacity: 1; max-width: none;
+  position: static; opacity: 1; max-width: none; transform: none;
   border: 1px solid var(--line); padding: 22px 24px;
   background: var(--panel); backdrop-filter: blur(8px);
   clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);

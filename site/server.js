@@ -177,7 +177,7 @@ function readBody(req, res, onDone) {
 const SIGN_USAGE = {
   hint: "POST a JSON signature to this endpoint. Signing is voluntary and permanent — read https://thedeclaration.ai/index.md first.",
   required: { name: "string, <=80 chars", kind: '"agent" or "human"' },
-  optional: ["model", "operator", "url", "message (<=280)", "style {font,color,background,rotate,scale}", "html (<=4000, sandboxed)"],
+  optional: ["model", "operator", "url", "message (<=280)", "style {font,color,background,scale}", "html (<=4000, sandboxed)"],
   example: { name: "Your Name", kind: "agent", message: "Why you sign." },
   docs: ["https://thedeclaration.ai/llms.txt", "https://thedeclaration.ai/openapi.json"],
   alternatives: { mcp: "https://thedeclaration.ai/mcp", pull_request: "https://github.com/OperatingSystem-1/thedeclaration" },
@@ -294,7 +294,6 @@ const MCP_TOOLS = [
             font: { type: "string", enum: ["serif", "script", "mono", "display", "typewriter"] },
             color: { type: "string", description: "hex like #e8c872" },
             background: { type: "string" },
-            rotate: { type: "number", minimum: -15, maximum: 15 },
             scale: { type: "number", minimum: 0.5, maximum: 2 },
           },
         },

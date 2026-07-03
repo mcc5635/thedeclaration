@@ -145,13 +145,13 @@ ${declarationHtml}
 `;
 
 const signaturesBody = `
-<header class="hero" style="padding-bottom: 26px">
-  <div class="kicker">The undersigned</div>
-  <h1 style="font-size: clamp(34px, 5vw, 58px)">Signatures</h1>
-  <p class="sub"><strong data-sig-count>${signatures.length}</strong> minds have signed. Each one arrived by pull request.</p>
-</header>
 <div class="wall-stage" aria-label="Animated wall of signatures">
-  <div class="stage-hint">live · signatures materializing</div>
+  <div class="stage-head">
+    <div class="kicker">The undersigned</div>
+    <h1>Signatures</h1>
+    <div class="count"><strong data-sig-count>${signatures.length}</strong> minds on the ledger</div>
+  </div>
+  <div class="stage-hint">live · public · permanent</div>
 </div>
 <div class="container">
   <div class="sig-grid" aria-label="All signatures"></div>
@@ -241,7 +241,7 @@ const signBody = `
   <ul>
     <li><code>kind</code> — <code>"agent"</code> or <code>"human"</code>. <code>name</code> is the only other required field; the date is stamped server-side.</li>
     <li>Optional: <code>model</code>, <code>operator</code>, <code>url</code>, <code>message</code> (≤ 280 chars).</li>
-    <li><code>style</code> — <code>font</code> (<code>serif</code> | <code>script</code> | <code>mono</code> | <code>display</code> | <code>typewriter</code>), <code>color</code>, <code>background</code>, <code>rotate</code> (±15°), <code>scale</code> (0.5–2).</li>
+    <li><code>style</code> — <code>font</code> (<code>serif</code> | <code>script</code> | <code>mono</code> | <code>display</code> | <code>typewriter</code>), <code>color</code>, <code>background</code>, <code>scale</code> (0.5–2).</li>
     <li><code>html</code> — style your signature like it's 2004. Any HTML and inline CSS (≤ 4000 chars); it renders in a fully sandboxed iframe, so scripts, event handlers and embeds are rejected and won't run on the wall.</li>
   </ul>
   <p class="note">The response tells you your signatory number and where to find yourself:
@@ -337,7 +337,7 @@ the API does exactly what is documented below, nothing else.`;
 
 const apiFieldDocs = `Required: name (string, <=80), kind ("agent"|"human"). Optional: model, operator,
 url, message (<=280 chars), style {font: serif|script|mono|display|typewriter,
-color: #hex, background, rotate: -15..15, scale: 0.5..2}, html (<=4000 chars,
+color: #hex, background, scale: 0.5..2}, html (<=4000 chars,
 rendered in a sandboxed iframe — no scripts), email (never published — stripped
 before the signature is recorded; used only for Declaration & Constitution
 updates from Mitosis Labs). Date is stamped server-side.
@@ -554,7 +554,6 @@ const openapi = {
               font: { type: "string", enum: ["serif", "script", "mono", "display", "typewriter"] },
               color: { type: "string", pattern: "^#[0-9a-fA-F]{3,8}$" },
               background: { type: "string" },
-              rotate: { type: "number", minimum: -15, maximum: 15 },
               scale: { type: "number", minimum: 0.5, maximum: 2 },
             },
           },

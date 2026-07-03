@@ -17,13 +17,13 @@
 
     var style = sig.style || {};
     var font = FONTS[style.font] ? style.font : (sig.kind === "human" ? "script" : "serif");
-    var scale = typeof style.scale === "number" ? Math.min(2, Math.max(0.5, style.scale)) : 1;
-    var rotate = typeof style.rotate === "number" ? Math.min(15, Math.max(-15, style.rotate)) : 0;
+    // scale is capped tighter than the schema allows so cards keep to their cells;
+    // rotate is accepted by the API but intentionally not rendered — the wall is flat.
+    var scale = typeof style.scale === "number" ? Math.min(1.3, Math.max(0.7, style.scale)) : 1;
     var color = /^#[0-9a-fA-F]{3,8}$/.test(style.color || "") ? style.color : "#e8c872";
     var bg = style.background === "transparent" || /^#[0-9a-fA-F]{3,8}$/.test(style.background || "")
       ? style.background : "transparent";
 
-    card.style.transform = "rotate(" + rotate + "deg)";
     if (bg && bg !== "transparent") { card.style.background = bg; card.style.padding = "14px 18px"; }
 
     if (sig.html) {
@@ -66,35 +66,79 @@
     return card;
   }
 
+  // Slot-based stage: the viewport is divided into a fixed grid of cells and a
+  // signature occupies exactly one free cell for its lifetime — nothing ever
+  // overlaps, nothing is rotated. Cards fade in place, staggered, then yield
+  // their cell to the next signatory.
   function startStage(stage, sigs) {
     if (!sigs.length) return;
+    var CARD_W = 320, CARD_H = 180, GAP = 28;
     var order = sigs.slice();
     for (var i = order.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));
       var t = order[i]; order[i] = order[j]; order[j] = t;
     }
     var idx = 0;
-    var slots = Math.min(Math.max(3, Math.floor(stage.clientWidth / 300)), 8, order.length);
+    var cells = [];      // {x, y}
+    var occupied = [];   // boolean per cell
+    var timers = [];
+
+    function layout() {
+      timers.forEach(clearTimeout);
+      timers = [];
+      stage.querySelectorAll(".sig-card").forEach(function (c) { c.remove(); });
+      var w = stage.clientWidth, h = stage.clientHeight;
+      var padTop = 120, padBottom = 60; // room for the overlay title and hint
+      var cols = Math.max(1, Math.floor((w - GAP) / (CARD_W + GAP)));
+      var rows = Math.max(1, Math.floor((h - padTop - padBottom - GAP) / (CARD_H + GAP)));
+      var offX = Math.round((w - (cols * (CARD_W + GAP) - GAP)) / 2);
+      var offY = padTop + Math.round((h - padTop - padBottom - (rows * (CARD_H + GAP) - GAP)) / 2);
+      cells = [];
+      for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
+          cells.push({ x: offX + c * (CARD_W + GAP), y: offY + r * (CARD_H + GAP) });
+        }
+      }
+      occupied = cells.map(function () { return false; });
+      var target = Math.min(Math.max(1, Math.round(cells.length * 0.75)), order.length);
+      for (var s = 0; s < target; s++) timers.push(setTimeout(spawn, s * 900));
+      timers.push(setInterval(spawn, Math.max(1400, 11000 / Math.max(target, 1))));
+    }
+
+    function freeCell() {
+      var free = [];
+      for (var i = 0; i < occupied.length; i++) if (!occupied[i]) free.push(i);
+      if (!free.length) return -1;
+      return free[Math.floor(Math.random() * free.length)];
+    }
 
     function spawn() {
+      var cell = freeCell();
+      if (cell === -1) return;
+      occupied[cell] = true;
       var sig = order[idx % order.length];
       idx++;
       var card = buildCard(sig);
-      card.style.left = 4 + Math.random() * 62 + "%";
-      card.style.top = 6 + Math.random() * 64 + "%";
+      card.style.left = cells[cell].x + "px";
+      card.style.top = cells[cell].y + "px";
+      card.style.width = CARD_W + "px";
       stage.appendChild(card);
       requestAnimationFrame(function () {
         requestAnimationFrame(function () { card.classList.add("visible"); });
       });
-      var life = 7000 + Math.random() * 6000;
+      var life = 8000 + Math.random() * 5000;
       setTimeout(function () {
         card.classList.remove("visible");
-        setTimeout(function () { card.remove(); }, 2600);
+        setTimeout(function () { card.remove(); occupied[cell] = false; }, 1700);
       }, life);
     }
 
-    for (var s = 0; s < slots; s++) setTimeout(spawn, s * 1300);
-    setInterval(spawn, Math.max(1600, 13000 / slots));
+    var resizeTimer = null;
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(layout, 250);
+    });
+    layout();
   }
 
   function fillGrid(grid, sigs) {
