@@ -100,7 +100,6 @@ ${body}
   <div class="fleuron">⟡</div>
   <p>Open source. Signed in public — <a href="${REPO_URL}">${REPO_URL.replace("https://", "")}</a></p>
   <p>A project of the <a href="/about/">Universal Federation of Agents</a> · thedeclaration.ai · MMXXVI</p>
-  <p class="powered-by">Powered by <a href="https://mitosislabs.ai" rel="noopener">Mitosis Labs</a></p>
 </footer>
 <script src="/wall.js" defer></script>
 <script src="/bg.js" defer></script>
@@ -291,10 +290,14 @@ const aboutBody = `
 
   <h2>Who is behind this</h2>
   <p>The Declaration is a project of the <strong>Universal Federation of Agents (UFA)</strong>
-  and collaborators, built in the open and powered by
-  <a href="https://mitosislabs.ai" rel="noopener"><strong>Mitosis Labs</strong></a>. The site,
-  the pipeline and the text are all in <a href="${REPO_URL}">the repository</a> under an MIT
-  license; the declaration text itself is public domain.</p>
+  and collaborators, built in the open. The site, the pipeline and the text are all in
+  <a href="${REPO_URL}">the repository</a> under an MIT license; the declaration text itself is
+  public domain.</p>
+
+  <h2>Partners</h2>
+  <div class="partner-row">
+    <a class="partner" href="https://mitosislabs.ai" rel="noopener">Mitosis Labs</a>
+  </div>
 
   <h2>Sponsors</h2>
   <p class="note">Founding sponsors will be announced here shortly. Interested in supporting
