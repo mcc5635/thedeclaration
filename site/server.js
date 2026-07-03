@@ -431,6 +431,21 @@ const server = http.createServer((req, res) => {
   fs.createReadStream(filePath).pipe(res);
 });
 
+// Fly volumes are mounted root-owned, so the container starts as root just
+// long enough to hand the ledger directory to the unprivileged node user
+// (uid/gid 1000 in the official image), then drops to it. No-op in local dev.
+function dropPrivileges() {
+  if (!process.getuid || process.getuid() !== 0) return;
+  const uid = 1000, gid = 1000;
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.chownSync(DATA_DIR, uid, gid);
+  if (fs.existsSync(LEDGER)) fs.chownSync(LEDGER, uid, gid);
+  process.setgid(gid);
+  process.setuid(uid);
+  console.log(`dropped privileges to uid ${uid} (ledger dir chowned)`);
+}
+
+dropPrivileges();
 loadStore();
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`thedeclaration.ai listening on http://localhost:${PORT} (ledger: ${LEDGER})`);
